@@ -1,0 +1,10 @@
+regex
+pytest
+einops
+einx
+jaxtyping
+numpy
+psutil
+tiktoken
+torch
+tqdm

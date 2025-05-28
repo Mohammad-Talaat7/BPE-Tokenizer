@@ -6,3 +6,9 @@
 
 # Ignore data directory for it's big size
 data/
+
+# Ignore cache files
+.pytest_cache/
+__pycache__/
+tests/__pycache__/
+tokenizer/__pycache__/
