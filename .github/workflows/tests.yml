@@ -16,6 +16,60 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v44
+      with:
+        files: |
+          src/**
+          tests/**
+
+    - name: Determine tests to run
+      id: test-selector
+      run: |
+        # Define file-test mapping
+        declare -A test_map=(
+          ["src/training_tokenizer.py"]="tests/test_train_bpe.py"
+          ["src/bpe_tokenizer.py"]="tests/test_tokenizer.py"
+          ["tests/test_train_bpe.py"]="tests/test_train_bpe.py"
+          ["tests/test_tokenizer.py"]="tests/test_tokenizer.py"
+        )
+        
+        # Initialize test set
+        tests_to_run=()
+        run_all=false
+        
+        # Process changed files
+        IFS=$'\n' read -d '' -r -a changed_files <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+        
+        for file in "${changed_files[@]}"; do
+          # Check for specific mappings
+          if [[ -v "test_map[$file]" ]]; then
+            tests_to_run+=("${test_map[$file]}")
+          # Run all tests if core utils change
+          elif [[ "$file" =~ src/utils.py ]] || [[ "$file" =~ src/__init__.py ]]; then
+            run_all=true
+          # Run all tests if common test dependencies change
+          elif [[ "$file" =~ tests/common.py ]] || [[ "$file" =~ tests/adapters.py ]]; then
+            run_all=true
+          # Run all tests if requirements change
+          elif [[ "$file" == "requirements.txt" ]] || [[ "$file" == "pyproject.toml" ]]; then
+            run_all=true
+          fi
+        done
+
+        # Remove duplicates and handle all-tests case
+        if [ "$run_all" = true ]; then
+          echo "test_command=pytest -v" >> $GITHUB_OUTPUT
+        elif [ ${#tests_to_run[@]} -gt 0 ]; then
+          unique_tests=$(printf "%s\n" "${tests_to_run[@]}" | sort -u | tr '\n' ' ')
+          echo "test_command=pytest -v $unique_tests" >> $GITHUB_OUTPUT
+        else
+          echo "test_command=echo 'No relevant tests to run'" >> $GITHUB_OUTPUT
+        fi
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -29,4 +83,4 @@ jobs:
         pip install pytest
 
     - name: Run tests
-      run: pytest -v
+      run: ${{ steps.test-selector.outputs.test_command }} -n auto
