@@ -3,8 +3,8 @@ from __future__ import annotations
 import os
 from typing import Any
 
-from tokenizer.training_tokenizer import train_bpe
-from tokenizer.bpe_tokenizer import tokenizer
+from src.training_tokenizer import train_bpe
+from src.bpe_tokenizer import tokenizer
 
 def get_tokenizer(
     vocab: dict[int, bytes],

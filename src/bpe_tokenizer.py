@@ -10,7 +10,7 @@ import logging
 #    filemode="w",
 #    level=logging.INFO,
 #    format="%(asctime)s - %(levelname)s - %(message)s",
-#)
+# )
 logger = logging.getLogger(__name__)
 
 
@@ -383,6 +383,7 @@ class tokenizer:
             f"special_tokens={len(self.special_tokens)})"
         )
 
+
 def test_tokenizer():
     """Test function to verify tokenizer functionality."""
     # Create a simple test tokenizer
@@ -412,9 +413,7 @@ def test_tokenizer():
     special_tokens = ["<|endoftext|>"]
 
     # Initialize tokenizer
-    tok = tokenizer(
-        vocab=vocab, merges=merges, special_tokens=special_tokens
-    )
+    tok = tokenizer(vocab=vocab, merges=merges, special_tokens=special_tokens)
 
     # Test encoding and decoding
     test_texts = [
