@@ -11,12 +11,12 @@ import pickle
 import ast
 
 # Set up logging
-#logging.basicConfig(
+# logging.basicConfig(
 #    filename="training_tokenizer.log",
 #    filemode="w",
 #    level=logging.INFO,
 #    format="%(asctime)s - %(levelname)s - %(message)s",
-#)
+# )
 logger = logging.getLogger(__name__)
 
 
